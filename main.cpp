@@ -6,6 +6,13 @@
 #include <iomanip>
 using namespace std;
 
+float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> currentFeatures, int featureToAdd){
+
+    float accuracy = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+    return accuracy;
+}
+
 void featureSearch(vector<vector<float> > data){
 
     vector<int> currentSetOfFeatures;
@@ -24,6 +31,12 @@ void featureSearch(vector<vector<float> > data){
 
             cout << "--Considering adding the " << j + 1 << " feature" << endl;
             accuracy = leaveOneOutCrossValidation(data, currentSetOfFeatures, j + 1);
+
+            if(accuracy > bestAccuracySoFar){
+
+                bestAccuracySoFar = accuracy;
+                featureToAddAtThisLevel.push_back(j + 1);
+            }
         }
     }
 }
