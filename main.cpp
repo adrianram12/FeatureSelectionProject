@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <iomanip>
+
 using namespace std;
 
 float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> currentFeatures, int featureToAdd){
@@ -13,31 +14,52 @@ float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> curren
     return accuracy;
 }
 
+bool alreadyConsidered(vector<int> currentSetOfFeatures, int featureInQuestion){
+
+    for(unsigned int i = 0; i < currentSetOfFeatures.size(); i++){
+
+        if(currentSetOfFeatures.at(i) == featureInQuestion){
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void featureSearch(vector<vector<float> > data){
 
     vector<int> currentSetOfFeatures;
     float bestAccuracySoFar;
     float accuracy;
+    int featureToAddAtThisLevel;
 
     for(int i = 0; i < data.size(); i++){
 
         cout << "On the " << i + 1 << "th level of the search tree" << endl;
 
-        vector<int> featureToAddAtThisLevel;
+        featureToAddAtThisLevel = 0;
         bestAccuracySoFar = 0;
 
 
         for(int j = 0; j < data.at(i).size() - 1; j++){
 
-            cout << "--Considering adding the " << j + 1 << " feature" << endl;
-            accuracy = leaveOneOutCrossValidation(data, currentSetOfFeatures, j + 1);
+            bool check = alreadyConsidered(currentSetOfFeatures, j + 1);
+
+            if(!check){
+
+                cout << "--Considering adding the " << j + 1 << " feature" << endl;
+                accuracy = leaveOneOutCrossValidation(data, currentSetOfFeatures, j + 1);
+            }
 
             if(accuracy > bestAccuracySoFar){
 
                 bestAccuracySoFar = accuracy;
-                featureToAddAtThisLevel.push_back(j + 1);
+                featureToAddAtThisLevel = j + 1;
             }
         }
+
+        cout << "On level " << i + 1 << " I added feature " << featureToAddAtThisLevel << " to the current set" << endl;
     }
 }
 
