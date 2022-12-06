@@ -59,6 +59,7 @@ void featureSearch(vector<vector<float> > data){
             }
         }
 
+        currentSetOfFeatures.push_back(featureToAddAtThisLevel);
         cout << "On level " << i + 1 << " I added feature " << featureToAddAtThisLevel << " to the current set" << endl;
     }
 }
