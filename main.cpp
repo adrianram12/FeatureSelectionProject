@@ -104,7 +104,7 @@ float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> curren
                             k++;
                         }
 
-                        newData.at(i).resize(newData.at(i).size() - 1);
+                       newData.at(i).resize(newData.at(i).size() - 1);
                     }
                 }
             }
@@ -389,6 +389,7 @@ int main(){
     if(theAlgorithm == 1){
 
         forwardSelection(dataTable);
+        whichSearch = true;
     }
     else if(theAlgorithm == 2){
 
