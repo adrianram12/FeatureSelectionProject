@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <limits>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -18,6 +19,7 @@ using namespace std;
 
 vector<int> bestFeaturesTotal;
 float bestAccuracyTotal = 0;
+bool whichSearch;
 
 // float calculateDistance(vector<vector<float> > data){
 
@@ -46,32 +48,69 @@ float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> curren
     int nearestNeighborLocation;
     int nearestNeighborLabel;
 
-    vector<vector<float> > newData(data.size(), vector<float>(currentFeatures.size() + 2)); //(currentFeatures.size() + 1);
+    vector<vector<float> > newData;
 
-    for(int x = 0; x < data.size(); x++){
+    if(whichSearch){
 
-        //added this recently!!!!!
-       if(currentFeatures.size() == 0){
+        newData.resize(data.size(), vector<float>(currentFeatures.size() + 2)); //(currentFeatures.size() + 1);
 
-            newData.at(x).at(0) = data.at(x).at(0);
-            newData.at(x).at(newData.at(x).size() - 1) = data.at(x).at(featureToAdd);
-            
-        } 
+        for(int x = 0; x < data.size(); x++){
+
+            //added this recently!!!!!
+        if(currentFeatures.size() == 0){
+
+                newData.at(x).at(0) = data.at(x).at(0);
+                newData.at(x).at(newData.at(x).size() - 1) = data.at(x).at(featureToAdd);
+                
+            } 
 
 
-        for(int y = 1; y <= currentFeatures.size(); y++){
+            for(int y = 1; y <= currentFeatures.size(); y++){
 
-           // newData.push_back(vector<float>());
+            // newData.push_back(vector<float>());
 
-            newData.at(x).at(0) = data.at(x).at(0);
-            newData.at(x).at(newData.at(x).size() - 1) = data.at(x).at(featureToAdd); //added this!!!!!!
+                newData.at(x).at(0) = data.at(x).at(0);
+                newData.at(x).at(newData.at(x).size() - 1) = data.at(x).at(featureToAdd); //added this!!!!!!
 
-            newData.at(x).at(y) = data.at(x).at(currentFeatures.at(y-1));
+                newData.at(x).at(y) = data.at(x).at(currentFeatures.at(y-1));
 
+            }
+
+        }
+    }
+
+    else if(!whichSearch){
+
+        int k;
+        newData = data;
+
+        for (int i = 0; i < newData.size(); i++) { // rows
+
+            for (int j = 1; j <= newData.at(i).size(); j++) { // columns
+
+                if (j == featureToAdd) {
+
+                    if(j == newData.at(i).size() - 1){
+
+                        newData.at(i).resize(newData.at(i).size() - 1);
+                    }
+                    else{
+
+                        k = j;
+
+                        while ((k + 1) < newData.at(i).size()) {
+
+                            newData.at(i).at(k) = newData.at(i).at(k + 1);
+                            k++;
+                        }
+
+                        newData.at(i).resize(newData.at(i).size() - 1);
+                    }
+                }
+            }
         }
 
     }
-
 
 
     for(int i = 0; i < newData.size(); i++){   // was orignally data.size()
@@ -221,6 +260,78 @@ void forwardSelection(vector<vector<float> > data){ //was featureSearch
 
 void backwardElimination(vector<vector<float> > data){
 
+    int numOfFeatures = data.at(0).size() - 1;
+    vector<int> currentSetOfFeatures;
+
+    for(int n = 0; n < numOfFeatures; n++){
+
+        currentSetOfFeatures.push_back(n + 1);
+    }
+
+    vector<int> copyCurrentSetOfFeatures;
+    float bestAccuracySoFar;
+    float accuracy = 0;
+    int featureToAddAtThisLevel;
+
+    for(int i = 0; i < data.at(0).size() - 1; i++){ 
+
+       cout << "On the " << i + 1 << "th level of the search tree" << endl; 
+        featureToAddAtThisLevel = 0;
+        bestAccuracySoFar = 0;
+
+
+        for(int j = 0; j < data.at(0).size() - 1; j++){ 
+            bool check = alreadyConsidered(currentSetOfFeatures, j + 1); 
+
+            if(check){
+
+                cout << "--Considering removing the " << j + 1 << " feature" << endl;  
+                //accuracy = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+                accuracy = leaveOneOutCrossValidation(data, currentSetOfFeatures, j + 1); 
+                //cout << "ACCURACY!!!!!!!!!! " << accuracy << endl;
+                //cout << "BESTACCURACY!!!!!! " << bestAccuracySoFar << endl;
+
+                if(accuracy > bestAccuracySoFar){
+
+                    if(accuracy > bestAccuracyTotal){
+
+                        bestAccuracyTotal = accuracy;
+                        copyCurrentSetOfFeatures = currentSetOfFeatures;
+                        copyCurrentSetOfFeatures.erase(remove(copyCurrentSetOfFeatures.begin(), copyCurrentSetOfFeatures.end(), j + 1), copyCurrentSetOfFeatures.end());
+                        // for(int l = 0; l < copyCurrentSetOfFeatures.size(); l++){
+
+                        //     cout << copyCurrentSetOfFeatures.at(l) << " ";
+                        //  }
+                        bestFeaturesTotal = copyCurrentSetOfFeatures;
+                    }
+
+                    bestAccuracySoFar = accuracy;
+                    featureToAddAtThisLevel = j + 1;
+              }
+            }
+        }
+
+        //currentSetOfFeatures.push_back(featureToAddAtThisLevel);
+
+        currentSetOfFeatures.erase(remove(currentSetOfFeatures.begin(), currentSetOfFeatures.end(), featureToAddAtThisLevel), currentSetOfFeatures.end());
+        for(int l = 0; l < currentSetOfFeatures.size(); l++){
+
+            cout << currentSetOfFeatures.at(l) << " ";
+        }
+        
+        cout << endl;
+        cout << endl;
+        cout << "Accuracy of this level: " << bestAccuracySoFar << endl;
+        cout << "On level " << i + 1 << " I deleted feature " << featureToAddAtThisLevel << " from the current set" << endl; 
+    }
+
+    for(int l = 0; l < bestFeaturesTotal.size(); l++){
+
+            cout << bestFeaturesTotal.at(l) << " ";
+    }
+    cout << endl;
+    cout << "final best accuracy: " << bestAccuracyTotal << endl;
+
 }
 
 int main(){
@@ -282,6 +393,7 @@ int main(){
     else if(theAlgorithm == 2){
 
         backwardElimination(dataTable);
+        whichSearch = false;
     }
    // featureSearch(dataTable);
 
