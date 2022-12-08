@@ -14,8 +14,7 @@ using namespace std;
 vector<int> bestFeaturesTotal;
 float bestAccuracyTotal = 0;
 bool whichSearch;
-int classifier1 = 0;
-int classifier2 = 0;
+int defaultRate = 0;
 
 float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> currentFeatures, int featureToAdd){
 
@@ -149,7 +148,7 @@ void forwardSelection(vector<vector<float> > data){
     float accuracy = 0;
     int featureToAddAtThisLevel;
 
-    cout << "The accuracy for considering no features is " << (static_cast<float>(classifier1) / static_cast<float>(data.size()))*100 << "%" << endl;
+    cout << "The accuracy for considering no features is " << (static_cast<float>(defaultRate) / static_cast<float>(data.size()))*100 << "%" << endl;
     cout << endl;
 
     for(int i = 0; i < data.at(0).size() - 1; i++){ 
@@ -225,9 +224,9 @@ void backwardElimination(vector<vector<float> > data){
     float accuracy = 0;
     int featureToAddAtThisLevel;
 
-    cout << "The accuracy for considering no features is " << (static_cast<float>(classifier2) / static_cast<float>(data.size()))*100 << "%" << endl;
+    cout << "The accuracy for considering no features is " << (static_cast<float>(defaultRate) / static_cast<float>(data.size()))*100 << "%" << endl;
     cout << endl;
-    
+
     for(int i = 0; i < data.at(0).size() - 1; i++){ 
  
         featureToAddAtThisLevel = 0;
@@ -343,6 +342,9 @@ int main(){
     //     cout << endl;
     // }
 
+    int classifier1 = 0;
+    int classifier2 = 0;
+
     for(unsigned int i = 0; i < dataTable.size(); i++){
 
         if(dataTable.at(i).at(0) == 1){
@@ -352,6 +354,13 @@ int main(){
         else{
             classifier2++;
         }
+    }
+
+    if(classifier1 > classifier2){
+        defaultRate = classifier1;
+    }
+    else{
+        defaultRate = classifier2;
     }
 
     cout << endl;
