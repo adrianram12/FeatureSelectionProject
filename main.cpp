@@ -7,37 +7,15 @@
 #include <limits>
 #include <cmath>
 #include <algorithm>
+#include <ctime>
 
 using namespace std;
-
-// float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> currentFeatures, int featureToAdd){
-
-//     float accuracy = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-
-//     return accuracy;
-// }
 
 vector<int> bestFeaturesTotal;
 float bestAccuracyTotal = 0;
 bool whichSearch;
-
-// float calculateDistance(vector<vector<float> > data){
-
-//     float sum = 0;
-    
-//     int j = 1;
-
-//     for(int i = 0; i < data.size(); i++){
-
-//         while(j <= data.at(i).size()){
-
-//             float sum = sum + pow((data.at(i).at(j) - data.at(i+1).at(j)), 2);
-//         }
-//     }
-
-//     return sum;
-
-// }
+int classifier1 = 0;
+int classifier2 = 0;
 
 float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> currentFeatures, int featureToAdd){
 
@@ -50,35 +28,30 @@ float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> curren
 
     vector<vector<float> > newData;
 
-    if(whichSearch){
+   if(whichSearch){
 
-        newData.resize(data.size(), vector<float>(currentFeatures.size() + 2)); //(currentFeatures.size() + 1);
+        newData.resize(data.size(), vector<float>(currentFeatures.size() + 2)); 
 
         for(int x = 0; x < data.size(); x++){
-
-            //added this recently!!!!!
-        if(currentFeatures.size() == 0){
+   
+            if(currentFeatures.size() == 0){
 
                 newData.at(x).at(0) = data.at(x).at(0);
                 newData.at(x).at(newData.at(x).size() - 1) = data.at(x).at(featureToAdd);
                 
             } 
 
-
             for(int y = 1; y <= currentFeatures.size(); y++){
 
-            // newData.push_back(vector<float>());
-
                 newData.at(x).at(0) = data.at(x).at(0);
-                newData.at(x).at(newData.at(x).size() - 1) = data.at(x).at(featureToAdd); //added this!!!!!!
+                newData.at(x).at(newData.at(x).size() - 1) = data.at(x).at(featureToAdd); 
 
                 newData.at(x).at(y) = data.at(x).at(currentFeatures.at(y-1));
 
             }
-
-        }
+        }      
     }
-
+    
     else if(!whichSearch){
 
         int k;
@@ -107,80 +80,49 @@ float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> curren
                        newData.at(i).resize(newData.at(i).size() - 1);
                     }
                 }
-            }
+            }  
         }
-
     }
 
-
-    for(int i = 0; i < newData.size(); i++){   // was orignally data.size()
-
-        //cout << "data.size() " << data.size() << endl;
-        //cout << "data.at(i).size() " << data.at(i).size() << endl;
-
-       // vector<vector<float> > objectsToClassify(&data[1], &data[data.at(i).size() - 1]);
-        //vector<vector<float> > labelObjectToClassify(&data[0], &data[1]);
-        //float sum = 0;
-        //int k = 1;
-
-        //cout << "Looping over i, at the " << i + 1 << " location" << endl;
-        //cout << "The " << i + 1 << "th object is in class " << data.at(i).at(0) << endl;
-        //cout << endl;
+    for(int i = 0; i < newData.size(); i++){   
 
         nearestNeighborDistance = numeric_limits<float>::max();
         nearestNeighborLocation = numeric_limits<int>::max();
 
-        for(int j = 0; j < newData.size(); j++){  //was orignally data.size()
+        for(int j = 0; j < newData.size(); j++){  
 
-            
             int k = 1;
             float sum = 0;
 
             if(j != i){
 
-                //cout << "Ask if " << i + 1 << " is nearest neighbor with " << j + 1 << endl;
+                while(k <= newData.at(i).size() - 1){  
 
-                while(k <= newData.at(i).size() - 1){  //was originally data.at(i).size() - 1
-
-                    //cout << "k " << k << endl;
-                   //cout << "X1 " << data.at(i).at(k) << " X2 " << data.at(j).at(k) << endl;
-                  // cout << "i " << i << " j " << j << endl;
-                    sum = sum + pow((newData.at(i).at(k) - newData.at(j).at(k)), 2); // originally data
-                    //cout << "SUMM!!!!!!!!!!! " << sum << endl;
+                    sum = sum + pow((newData.at(i).at(k) - newData.at(j).at(k)), 2); 
+                    
                     k++;
-
                 }
 
-                //k = 1;
-
                 float distance = sqrt(sum);
-                //cout << "DISTANCE!!!!!!!!!!!!!!! " << distance << endl;
-               // cout << "NEARESTNEIGHBORDISTANCE!!!!!!! " << nearestNeighborDistance << endl;
 
                 if(distance < nearestNeighborDistance){
 
                     nearestNeighborDistance = distance;
                     nearestNeighborLocation = j;
-                    //cout << "nearestNeighborlocation " << nearestNeighborLocation << endl;
-                    nearestNeighborLabel = newData.at(nearestNeighborLocation).at(0); //originally data
+                    nearestNeighborLabel = newData.at(nearestNeighborLocation).at(0);
                 }
             
             }
         
         }
 
-        //cout << "Object " << i + 1 << " is class " << data.at(i).at(0) << endl;
-        //cout << "Its nearest neighbor is " << nearestNeighborLocation << " which is in class " << nearestNeighborLabel << endl;
-
-        if(newData.at(i).at(0) == nearestNeighborLabel){ //originally data
+        if(newData.at(i).at(0) == nearestNeighborLabel){ 
 
             numberCorrectlyClassified = numberCorrectlyClassified + 1;
         }
     }
 
     accuracy = static_cast<double>(numberCorrectlyClassified) / static_cast<double>(data.size());
-
-   cout << "ACCURACY!!!!!!!! " << accuracy << endl;
 
     return accuracy;
 }
@@ -199,7 +141,7 @@ bool alreadyConsidered(vector<int> &currentSetOfFeatures, int featureInQuestion)
     return false;
 }
 
-void forwardSelection(vector<vector<float> > data){ //was featureSearch
+void forwardSelection(vector<vector<float> > data){ 
 
     vector<int> currentSetOfFeatures;
     vector<int> copyCurrentSetOfFeatures;
@@ -207,9 +149,11 @@ void forwardSelection(vector<vector<float> > data){ //was featureSearch
     float accuracy = 0;
     int featureToAddAtThisLevel;
 
+    cout << "The accuracy for considering no features is " << (static_cast<float>(classifier1) / static_cast<float>(data.size()))*100 << "%" << endl;
+    cout << endl;
+
     for(int i = 0; i < data.at(0).size() - 1; i++){ 
 
-       cout << "On the " << i + 1 << "th level of the search tree" << endl; 
         featureToAddAtThisLevel = 0;
         bestAccuracySoFar = 0;
 
@@ -219,12 +163,19 @@ void forwardSelection(vector<vector<float> > data){ //was featureSearch
 
             if(!check){
 
-                cout << "--Considering adding the " << j + 1 << " feature" << endl;  
-                //accuracy = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+                cout << "--Considering adding feature " << j + 1 << endl;  
                 accuracy = leaveOneOutCrossValidation(data, currentSetOfFeatures, j + 1); 
-                //cout << "ACCURACY!!!!!!!!!! " << accuracy << endl;
-                //cout << "BESTACCURACY!!!!!! " << bestAccuracySoFar << endl;
+                currentSetOfFeatures.push_back(j + 1);
+                cout << "   Using feature(s) { ";
 
+                for(int s = 0; s < currentSetOfFeatures.size(); s++){
+
+                    cout << currentSetOfFeatures.at(s) << " ";
+                }
+                cout << "} accuracy is " << accuracy * 100 << "%" << endl;
+                
+                currentSetOfFeatures.erase(remove(currentSetOfFeatures.begin(), currentSetOfFeatures.end(), (j + 1)), currentSetOfFeatures.end());
+                
                 if(accuracy > bestAccuracySoFar){
 
                     if(accuracy > bestAccuracyTotal){
@@ -237,33 +188,34 @@ void forwardSelection(vector<vector<float> > data){ //was featureSearch
 
                     bestAccuracySoFar = accuracy;
                     featureToAddAtThisLevel = j + 1;
-              }
+                }
             }
         }
 
         currentSetOfFeatures.push_back(featureToAddAtThisLevel);
 
-        
         cout << endl;
-        cout << endl;
-        cout << "Accuracy of this level: " << bestAccuracySoFar << endl;
+        cout << "Best accuracy of this level: " << bestAccuracySoFar * 100 << "%" << endl;
         cout << "On level " << i + 1 << " I added feature " << featureToAddAtThisLevel << " to the current set" << endl; 
+        cout << endl;
     }
 
+    cout << "Finished Forward Selection!" << endl;
+    cout << "The best feature subset is { ";
     for(int l = 0; l < bestFeaturesTotal.size(); l++){
 
             cout << bestFeaturesTotal.at(l) << " ";
     }
+    cout << "}, which has an accuracy of " << bestAccuracyTotal * 100 << "%" << endl;
     cout << endl;
-    cout << "final best accuracy: " << bestAccuracyTotal << endl;
+    
 }
 
 void backwardElimination(vector<vector<float> > data){
 
-    int numOfFeatures = data.at(0).size() - 1;
     vector<int> currentSetOfFeatures;
 
-    for(int n = 0; n < numOfFeatures; n++){
+    for(int n = 0; n < data.at(0).size() - 1; n++){
 
         currentSetOfFeatures.push_back(n + 1);
     }
@@ -273,11 +225,13 @@ void backwardElimination(vector<vector<float> > data){
     float accuracy = 0;
     int featureToAddAtThisLevel;
 
+    cout << "The accuracy for considering no features is " << (static_cast<float>(classifier2) / static_cast<float>(data.size()))*100 << "%" << endl;
+    cout << endl;
+    
     for(int i = 0; i < data.at(0).size() - 1; i++){ 
-
-       cout << "On the " << i + 1 << "th level of the search tree" << endl; 
+ 
         featureToAddAtThisLevel = 0;
-        bestAccuracySoFar = 0;
+        bestAccuracySoFar = 0; 
 
 
         for(int j = 0; j < data.at(0).size() - 1; j++){ 
@@ -286,10 +240,17 @@ void backwardElimination(vector<vector<float> > data){
             if(check){
 
                 cout << "--Considering removing the " << j + 1 << " feature" << endl;  
-                //accuracy = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
                 accuracy = leaveOneOutCrossValidation(data, currentSetOfFeatures, j + 1); 
-                //cout << "ACCURACY!!!!!!!!!! " << accuracy << endl;
-                //cout << "BESTACCURACY!!!!!! " << bestAccuracySoFar << endl;
+                currentSetOfFeatures.erase(remove(currentSetOfFeatures.begin(), currentSetOfFeatures.end(), (j + 1)), currentSetOfFeatures.end());
+                cout << "   Using feature(s) { ";
+
+                for(int s = 0; s < currentSetOfFeatures.size(); s++){
+
+                    cout << currentSetOfFeatures.at(s) << " ";
+                }
+                cout << "} accuracy is " << accuracy * 100 << "%" << endl;
+                currentSetOfFeatures.push_back(j + 1);
+
 
                 if(accuracy > bestAccuracySoFar){
 
@@ -297,40 +258,32 @@ void backwardElimination(vector<vector<float> > data){
 
                         bestAccuracyTotal = accuracy;
                         copyCurrentSetOfFeatures = currentSetOfFeatures;
-                        copyCurrentSetOfFeatures.erase(remove(copyCurrentSetOfFeatures.begin(), copyCurrentSetOfFeatures.end(), j + 1), copyCurrentSetOfFeatures.end());
-                        // for(int l = 0; l < copyCurrentSetOfFeatures.size(); l++){
-
-                        //     cout << copyCurrentSetOfFeatures.at(l) << " ";
-                        //  }
+                        copyCurrentSetOfFeatures.erase(remove(copyCurrentSetOfFeatures.begin(), copyCurrentSetOfFeatures.end(), (j + 1)), copyCurrentSetOfFeatures.end());
                         bestFeaturesTotal = copyCurrentSetOfFeatures;
                     }
 
                     bestAccuracySoFar = accuracy;
                     featureToAddAtThisLevel = j + 1;
-              }
+                }
             }
         }
 
-        //currentSetOfFeatures.push_back(featureToAddAtThisLevel);
-
         currentSetOfFeatures.erase(remove(currentSetOfFeatures.begin(), currentSetOfFeatures.end(), featureToAddAtThisLevel), currentSetOfFeatures.end());
-        for(int l = 0; l < currentSetOfFeatures.size(); l++){
-
-            cout << currentSetOfFeatures.at(l) << " ";
-        }
         
         cout << endl;
+        cout << "Best accuracy of this level: " << bestAccuracySoFar * 100 << "%" << endl;
+        cout << "On level " << i + 1 << " I removed feature " << featureToAddAtThisLevel << " from the current set" << endl; 
         cout << endl;
-        cout << "Accuracy of this level: " << bestAccuracySoFar << endl;
-        cout << "On level " << i + 1 << " I deleted feature " << featureToAddAtThisLevel << " from the current set" << endl; 
     }
 
+    cout << "Finished Backward Elimination!" << endl;
+    cout << "The best feature subset is { ";
     for(int l = 0; l < bestFeaturesTotal.size(); l++){
 
             cout << bestFeaturesTotal.at(l) << " ";
     }
+    cout << "}, which has an accuracy of " << bestAccuracyTotal * 100 << "%" << endl;
     cout << endl;
-    cout << "final best accuracy: " << bestAccuracyTotal << endl;
 
 }
 
@@ -343,13 +296,21 @@ int main(){
     int theAlgorithm;
     vector<vector<float> > dataTable;
 
+    cout << "Welcome to my Feature Selection Algorithm." << endl;
+    cout << endl;
+
     cout << "Please type in the name of the file you would like to test." << endl;
 
     cin >> inputFile;
+    cout << endl;
 
-    cout << "Type the number of the algorithm you want to run." << endl;
+    cout << "Please type the number of the algorithm you want to run." << endl;
+    cout << "Type '1' for Forward Selection." << endl;
+    cout << "Type '2' for Backward Elimination." << endl;
 
     cin >> theAlgorithm;
+
+    clock_t startTime = clock();
 
     newFile.open(inputFile);
 
@@ -382,22 +343,40 @@ int main(){
     //     cout << endl;
     // }
 
-    //cout << fixed << setprecision(7) << dataTable.at(0).at(1) << " times " << dataTable.at(0).at(2) << " equals " << dataTable.at(0).at(1) * dataTable.at(0).at(2) << endl; 
+    for(unsigned int i = 0; i < dataTable.size(); i++){
 
+        if(dataTable.at(i).at(0) == 1){
+
+            classifier1++;
+        }
+        else{
+            classifier2++;
+        }
+    }
+
+    cout << endl;
     cout << "This data set has " << dataTable.at(0).size() - 1 << " features (not including the class attribute), with " << dataTable.size() << " instances." << endl;
+    cout << endl;
 
     if(theAlgorithm == 1){
 
-        forwardSelection(dataTable);
         whichSearch = true;
+        cout << "Now beginning Forward Selection." << endl;
+        cout << endl;
+        forwardSelection(dataTable);
+        double time = ((clock() - startTime) / (double)CLOCKS_PER_SEC);
+        cout << fixed << setprecision(1) << "It took " << time << " seconds to compute." << endl;
+        
     }
     else if(theAlgorithm == 2){
 
-        backwardElimination(dataTable);
         whichSearch = false;
+        cout << "Now beginning Backward Elimination." << endl;
+        backwardElimination(dataTable);
+        double time = ((clock() - startTime) / (double)CLOCKS_PER_SEC);
+        cout << fixed << setprecision(1) << "It took " << time << " seconds to compute." << endl;
+       
     }
-   // featureSearch(dataTable);
-
-    //demoAccuracy(dataTable);
+   
     return 0;
 }
