@@ -53,14 +53,18 @@ float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> curren
     
     else if(!whichSearch){
 
+        
         int k;
         newData = data;
 
         for (int i = 0; i < newData.size(); i++) { // rows
 
-            for (int j = 1; j <= newData.at(i).size(); j++) { // columns
+
+            for (int j = 1; j <= newData.at(i).size(); j++) { // columns 
+
 
                 if (j == featureToAdd) {
+                
 
                     if(j == newData.at(i).size() - 1){
 
@@ -80,7 +84,7 @@ float leaveOneOutCrossValidation(vector<vector<float> > data, vector<int> curren
                     }
                 }
             }  
-        }
+        }       
     }
 
     for(int i = 0; i < newData.size(); i++){   
@@ -259,16 +263,18 @@ void backwardElimination(vector<vector<float> > data){
                         copyCurrentSetOfFeatures = currentSetOfFeatures;
                         copyCurrentSetOfFeatures.erase(remove(copyCurrentSetOfFeatures.begin(), copyCurrentSetOfFeatures.end(), (j + 1)), copyCurrentSetOfFeatures.end());
                         bestFeaturesTotal = copyCurrentSetOfFeatures;
+                        
                     }
 
                     bestAccuracySoFar = accuracy;
                     featureToAddAtThisLevel = j + 1;
+                    
                 }
             }
         }
 
         currentSetOfFeatures.erase(remove(currentSetOfFeatures.begin(), currentSetOfFeatures.end(), featureToAddAtThisLevel), currentSetOfFeatures.end());
-        
+
         cout << endl;
         cout << "Best accuracy of this level: " << bestAccuracySoFar * 100 << "%" << endl;
         cout << "On level " << i + 1 << " I removed feature " << featureToAddAtThisLevel << " from the current set" << endl; 
@@ -331,16 +337,6 @@ int main(){
     }
 
     newFile.close();
-
-    // for(unsigned int i = 0; i < dataTable.size(); i++){
-
-    //     for(unsigned int j = 0; j < dataTable.at(i).size(); j++){
-
-    //         cout << dataTable.at(i).at(j) << " ";
-    //     }
-
-    //     cout << endl;
-    // }
 
     int classifier1 = 0;
     int classifier2 = 0;
